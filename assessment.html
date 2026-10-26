@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Career Assessment — SkillBridge</title>
+  <meta name="description" content="Take our 10-question student career assessment to discover your optimal tech career path." />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo" aria-label="SkillBridge Home">
+        <div class="brand-icon">S</div>
+        <div class="brand-text">Skill<span>Bridge</span></div>
+      </a>
+
+      <button class="mobile-menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="assessment.html" class="nav-link active">Career Assessment</a></li>
+          <li><a href="careers.html" class="nav-link">Explore Careers</a></li>
+          <li><a href="roadmap.html" class="nav-link">Learning Roadmap</a></li>
+          <li><a href="progress.html" class="nav-link">My Progress</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <div class="assessment-layout">
+        
+        <!-- Header & Progress -->
+        <div class="assessment-progress-container">
+          <div class="assessment-meta">
+            <span id="questionCategory" class="question-category">Category</span>
+            <span id="questionNumber" class="assessment-indicator">Question 1 of 10</span>
+          </div>
+          <div class="progress-track" aria-label="Assessment Progress">
+            <div id="progressBar" class="progress-fill" style="width: 10%;"></div>
+          </div>
+        </div>
+
+        <!-- Validation Alert Banner -->
+        <div id="validationAlert" style="display: none; background-color: #FEF2F2; border: 1px solid #FECACA; color: #DC2626; padding: 12px 16px; border-radius: var(--radius-sm); margin-bottom: 18px; font-size: 0.9rem; font-weight: 500;">
+          Please select an option before proceeding.
+        </div>
+
+        <!-- Interactive Question Card -->
+        <div class="question-card">
+          <h2 id="questionText" class="question-text">
+            Loading assessment question...
+          </h2>
+
+          <div id="optionsList" class="options-list">
+            <!-- Options dynamically rendered by js/assessment.js -->
+          </div>
+        </div>
+
+        <!-- Step Navigation Controls -->
+        <div class="assessment-nav">
+          <button id="prevBtn" class="btn btn-secondary" disabled>
+            ← Previous
+          </button>
+          
+          <div style="display: flex; gap: 10px;">
+            <a href="index.html" class="btn btn-secondary" style="font-weight: normal; color: var(--navy-500);">
+              Cancel
+            </a>
+            <button id="nextBtn" class="btn btn-primary">
+              Next Question →
+            </button>
+            <button id="submitBtn" class="btn btn-purple" style="display: none;">
+              Submit Assessment &amp; View Results ✓
+            </button>
+          </div>
+        </div>
+
+        <!-- Explanatory note -->
+        <div style="text-align: center; margin-top: 36px; font-size: 0.82rem; color: var(--navy-500);">
+          Questions evaluate interests, working styles, problem-solving habits, and technical affinities. Answers are saved locally to compute your top career matches.
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-content">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="brand-icon" style="width: 26px; height: 26px; font-size: 0.9rem;">S</div>
+          <strong style="color: var(--navy-900);">SkillBridge</strong> — Smart Career &amp; Skill Navigator
+        </div>
+
+        <ul class="footer-nav">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="assessment.html">Assessment</a></li>
+          <li><a href="careers.html">Careers</a></li>
+          <li><a href="roadmap.html">Roadmap</a></li>
+          <li><a href="progress.html">My Progress</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-academic-note">
+        BCA Mini-Project &bull; Built with pure HTML5, CSS3 &amp; Vanilla JavaScript &bull; All assessment calculations and progress saved locally in browser localStorage.
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+  <script src="js/assessment.js"></script>
+</body>
+</html>

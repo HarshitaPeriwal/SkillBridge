@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Progress — SkillBridge</title>
+  <meta name="description" content="View your career assessment history, active roadmap completion, and learning milestones." />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo" aria-label="SkillBridge Home">
+        <div class="brand-icon">S</div>
+        <div class="brand-text">Skill<span>Bridge</span></div>
+      </a>
+
+      <button class="mobile-menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="assessment.html" class="nav-link">Career Assessment</a></li>
+          <li><a href="careers.html" class="nav-link">Explore Careers</a></li>
+          <li><a href="roadmap.html" class="nav-link">Learning Roadmap</a></li>
+          <li><a href="progress.html" class="nav-link active">My Progress</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container" style="padding-top: 30px;">
+
+      <div class="section-header" style="text-align: left; margin-bottom: 24px; max-width: 100%;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 14px;">
+          <div>
+            <h1 class="section-title">Student Learning Dashboard</h1>
+            <p class="section-subtitle">
+              Review your career evaluation summary, tracked competencies, and persistent progress.
+            </p>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <a href="assessment.html" class="btn btn-secondary btn-sm">
+              ↺ Retake Assessment
+            </a>
+            <button id="resetProgressBtn" class="btn btn-danger-outline btn-sm">
+              Reset Progress
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State if no assessment or progress exists -->
+      <div id="progressEmptyState" class="empty-state-card" style="display: none;">
+        <div class="empty-state-icon">🚀</div>
+        <h2 class="empty-state-title">Welcome to Your Progress Tracker!</h2>
+        <p class="empty-state-desc">
+          You haven't completed any assessments or checked off roadmap milestones yet. Take the quick 10-question evaluation to populate your personalized student dashboard.
+        </p>
+        <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+          <a href="assessment.html" class="btn btn-primary btn-lg">
+            Start Career Assessment →
+          </a>
+          <a href="careers.html" class="btn btn-secondary btn-lg">
+            Browse Careers
+          </a>
+        </div>
+      </div>
+
+      <!-- Dashboard Main Content Grid -->
+      <div id="progressDashboardContent" style="display: none;">
+        
+        <!-- Summary Stat Cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 28px;">
+          <div class="card" style="padding: 20px;">
+            <div style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: var(--navy-500); letter-spacing: 0.05em;">Top Recommended Track</div>
+            <div id="summaryTopCareer" style="font-size: 1.3rem; font-weight: 800; color: var(--navy-900); margin: 6px 0 2px;">Web Developer</div>
+            <div id="summaryTopMatch" style="font-size: 0.88rem; color: var(--purple-700); font-weight: 600;">92% Match</div>
+          </div>
+
+          <div class="card" style="padding: 20px;">
+            <div style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: var(--navy-500); letter-spacing: 0.05em;">Active Roadmap Track</div>
+            <div id="summaryActiveRoadmap" style="font-size: 1.3rem; font-weight: 800; color: var(--navy-900); margin: 6px 0 2px;">Web Developer</div>
+            <div id="summaryAssessmentDate" style="font-size: 0.82rem; color: var(--navy-500);">Assessed recently</div>
+          </div>
+
+          <div class="card" style="padding: 20px;">
+            <div style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; color: var(--navy-500); letter-spacing: 0.05em;">Curriculum Completion</div>
+            <div id="summaryPercentText" style="font-size: 1.3rem; font-weight: 800; color: var(--purple-700); margin: 6px 0 2px;">0%</div>
+            <div id="summaryMilestonesCount" style="font-size: 0.82rem; color: var(--navy-600);">0 of 10 completed</div>
+          </div>
+        </div>
+
+        <!-- Overall Active Track Progress Bar Card -->
+        <div class="card" style="margin-bottom: 28px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-size: 0.95rem; font-weight: 700; color: var(--navy-900);">Active Track Progress Bar</span>
+            <a href="roadmap.html" style="font-size: 0.85rem; font-weight: 600; color: var(--purple-700);">Continue Roadmap →</a>
+          </div>
+          <div class="progress-track" style="height: 10px;">
+            <div id="summaryProgressBarFill" class="progress-fill" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <!-- Two Column Detailed Section -->
+        <div class="dashboard-grid">
+          
+          <!-- Column 1: Top Career Matches -->
+          <div>
+            <div class="card">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--navy-900);">Top Recommended Careers</h2>
+                <a href="results.html" style="font-size: 0.85rem; font-weight: 600; color: var(--purple-700);">Full Breakdown →</a>
+              </div>
+              <p style="font-size: 0.85rem; color: var(--navy-600); margin-bottom: 14px;">
+                Generated from your answers to the 10 assessment questions.
+              </p>
+              
+              <div id="dashboardTopCareersList">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Column 2: Completed Milestones -->
+          <div>
+            <div class="card">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--navy-900);">Completed Milestones</h2>
+              </div>
+              <p style="font-size: 0.85rem; color: var(--navy-600); margin-bottom: 14px;">
+                Items marked complete in your active roadmap.
+              </p>
+
+              <div id="dashboardCompletedMilestones" style="max-height: 380px; overflow-y: auto;">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Reset Confirmation Modal -->
+  <div id="resetConfirmModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="resetModalTitle">
+    <div class="modal-box confirm-box">
+      <div style="font-size: 2.2rem; margin-bottom: 12px;">⚠️</div>
+      <h3 id="resetModalTitle" style="font-size: 1.35rem; font-weight: 700; color: var(--navy-900); margin-bottom: 10px;">
+        Reset All Saved Progress?
+      </h3>
+      <p style="font-size: 0.92rem; color: var(--navy-600); line-height: 1.5;">
+        This will clear all your assessment answers, career match scores, and checked roadmap items from your browser's localStorage. This action cannot be undone.
+      </p>
+      <div class="confirm-actions">
+        <button id="cancelResetBtn" class="btn btn-secondary">
+          Cancel
+        </button>
+        <button id="confirmResetBtn" class="btn btn-danger-outline" style="background-color: #DC2626; color: #FFFFFF; border-color: #DC2626;">
+          Yes, Reset Everything
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-content">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="brand-icon" style="width: 26px; height: 26px; font-size: 0.9rem;">S</div>
+          <strong style="color: var(--navy-900);">SkillBridge</strong> — Smart Career &amp; Skill Navigator
+        </div>
+
+        <ul class="footer-nav">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="assessment.html">Assessment</a></li>
+          <li><a href="careers.html">Careers</a></li>
+          <li><a href="roadmap.html">Roadmap</a></li>
+          <li><a href="progress.html">My Progress</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-academic-note">
+        BCA Mini-Project &bull; Built with pure HTML5, CSS3 &amp; Vanilla JavaScript &bull; All assessment calculations and progress saved locally in browser localStorage.
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+  <script src="js/progress.js"></script>
+</body>
+</html>

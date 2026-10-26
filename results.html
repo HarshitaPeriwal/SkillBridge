@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Career Results — SkillBridge</title>
+  <meta name="description" content="View your personalized career recommendations and match scores." />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo" aria-label="SkillBridge Home">
+        <div class="brand-icon">S</div>
+        <div class="brand-text">Skill<span>Bridge</span></div>
+      </a>
+
+      <button class="mobile-menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="assessment.html" class="nav-link">Career Assessment</a></li>
+          <li><a href="careers.html" class="nav-link">Explore Careers</a></li>
+          <li><a href="roadmap.html" class="nav-link">Learning Roadmap</a></li>
+          <li><a href="progress.html" class="nav-link">My Progress</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      
+      <!-- Results Header -->
+      <section class="results-hero">
+        <span class="badge badge-purple" style="margin-bottom: 8px;">Analysis Complete</span>
+        <h1 class="section-title">Your Recommended Career Paths</h1>
+        <p class="section-subtitle">
+          Based on your assessment responses across working styles, problem solving, and technical preferences, here are your top 3 matching career disciplines.
+        </p>
+      </section>
+
+      <!-- Indicative Guidance Disclaimer Banner -->
+      <div class="results-banner-disclaimer">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0;">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <div>
+          <strong>Indicative Student Guidance Notice:</strong> These recommendations are calculated using a weighted scoring model to help explore potential tech roles. They are intended as practical learning guidance for BCA students, rather than a clinical psychometric or scientifically validated aptitude test.
+        </div>
+      </div>
+
+      <!-- Empty State if no assessment has been taken -->
+      <div id="resultsEmptyState" class="empty-state-card" style="display: none;">
+        <div class="empty-state-icon">📋</div>
+        <h3 class="empty-state-title">No Assessment Results Found</h3>
+        <p class="empty-state-desc">
+          You haven't completed the career assessment yet. Answer 10 brief multiple-choice questions to receive personalized career matches.
+        </p>
+        <a href="assessment.html" class="btn btn-primary btn-lg">
+          Take Assessment Now →
+        </a>
+      </div>
+
+      <!-- Dynamic Results Cards Container -->
+      <div id="resultsContainer" class="top-results-grid">
+        <!-- Rendered by js/results.js -->
+      </div>
+
+      <!-- Bottom Quick Actions -->
+      <div style="background-color: #FFFFFF; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 40px;">
+        <div>
+          <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--navy-900);">Want to try different answers?</h4>
+          <p style="font-size: 0.88rem; color: var(--navy-600);">You can retake the assessment at any time to see alternative career tracks.</p>
+        </div>
+        <div style="display: flex; gap: 12px;">
+          <button id="retakeAssessmentBtn" class="btn btn-secondary">
+            Retake Assessment ↺
+          </button>
+          <a href="careers.html" class="btn btn-primary">
+            Explore All 6 Careers →
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-content">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="brand-icon" style="width: 26px; height: 26px; font-size: 0.9rem;">S</div>
+          <strong style="color: var(--navy-900);">SkillBridge</strong> — Smart Career &amp; Skill Navigator
+        </div>
+
+        <ul class="footer-nav">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="assessment.html">Assessment</a></li>
+          <li><a href="careers.html">Careers</a></li>
+          <li><a href="roadmap.html">Roadmap</a></li>
+          <li><a href="progress.html">My Progress</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-academic-note">
+        BCA Mini-Project &bull; Built with pure HTML5, CSS3 &amp; Vanilla JavaScript &bull; All assessment calculations and progress saved locally in browser localStorage.
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+  <script src="js/results.js"></script>
+</body>
+</html>

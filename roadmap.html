@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Learning Roadmap — SkillBridge</title>
+  <meta name="description" content="Structured career learning roadmaps, milestones, projects, and readiness checklists." />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo" aria-label="SkillBridge Home">
+        <div class="brand-icon">S</div>
+        <div class="brand-text">Skill<span>Bridge</span></div>
+      </a>
+
+      <button class="mobile-menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="assessment.html" class="nav-link">Career Assessment</a></li>
+          <li><a href="careers.html" class="nav-link">Explore Careers</a></li>
+          <li><a href="roadmap.html" class="nav-link active">Learning Roadmap</a></li>
+          <li><a href="progress.html" class="nav-link">My Progress</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container roadmap-container">
+
+      <!-- Career Selector Toolbar -->
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 20px;">
+        <div>
+          <a href="careers.html" style="font-size: 0.88rem; color: var(--navy-600); display: flex; align-items: center; gap: 4px;">
+            ← Back to All Careers
+          </a>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <label for="roadmapCareerSelect" style="font-size: 0.9rem; font-weight: 600; color: var(--navy-800);">
+            Select Career Track:
+          </label>
+          <select id="roadmapCareerSelect" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.9rem; cursor: pointer;">
+            <!-- Populated dynamically by js/roadmap.js -->
+          </select>
+        </div>
+      </div>
+
+      <!-- Roadmap Header Card -->
+      <div class="roadmap-header-card">
+        <span id="roadmapCategoryBadge" class="badge badge-purple" style="margin-bottom: 8px;">Development &amp; Engineering</span>
+        <h1 id="roadmapCareerTitle" style="font-size: 1.85rem; font-weight: 800; color: var(--navy-900); margin-bottom: 10px;">
+          Web Developer Learning Roadmap
+        </h1>
+        <p id="roadmapCareerDesc" style="font-size: 0.98rem; color: var(--navy-700); line-height: 1.6;">
+          A progressive, step-by-step curriculum guiding you from fundamentals to intermediate practical projects and industry readiness.
+        </p>
+
+        <!-- Dynamic Track Progress Widget -->
+        <div class="roadmap-progress-widget">
+          <div class="roadmap-progress-header">
+            <span>Your Roadmap Completion:</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span id="roadmapCompletedCount" style="color: var(--navy-600); font-size: 0.82rem;">0 of 10 completed</span>
+              <strong id="roadmapProgressPercent" style="color: var(--purple-700); font-size: 1.1rem;">0%</strong>
+            </div>
+          </div>
+          <div class="progress-track">
+            <div id="roadmapProgressBarFill" class="progress-fill" style="width: 0%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Academic Notice Disclaimer -->
+      <div style="background-color: var(--warning-bg); border: 1px solid var(--warning-border); color: #92400E; padding: 10px 16px; border-radius: var(--radius-sm); font-size: 0.84rem; margin-bottom: 28px;">
+        ⚠️ <strong>Curriculum Note:</strong> This roadmap outlines recommended foundational competencies and college practice milestones. Completing this roadmap develops practical skills but does not represent an accredited certification or guarantee of employment.
+      </div>
+
+      <!-- Phase 1: Beginner Milestones -->
+      <section class="roadmap-section-block">
+        <div class="roadmap-step-header">
+          <span class="roadmap-phase-badge">Phase 1</span>
+          <h2 class="roadmap-step-title">Beginner Competencies</h2>
+        </div>
+        <p style="font-size: 0.88rem; color: var(--navy-600); margin-bottom: 14px;">
+          Build solid foundational knowledge and syntax confidence. Click any item to check it off.
+        </p>
+        <div id="beginnerMilestonesList" class="roadmap-items-list">
+          <!-- Rendered by js/roadmap.js -->
+        </div>
+      </section>
+
+      <!-- Phase 2: Intermediate Milestones -->
+      <section class="roadmap-section-block">
+        <div class="roadmap-step-header">
+          <span class="roadmap-phase-badge" style="background-color: var(--purple-700);">Phase 2</span>
+          <h2 class="roadmap-step-title">Intermediate Engineering &amp; Tooling</h2>
+        </div>
+        <p style="font-size: 0.88rem; color: var(--navy-600); margin-bottom: 14px;">
+          Apply tools, frameworks, state management, and real-world development workflows.
+        </p>
+        <div id="intermediateMilestonesList" class="roadmap-items-list">
+          <!-- Rendered by js/roadmap.js -->
+        </div>
+      </section>
+
+      <!-- Phase 3: Practice Projects -->
+      <section class="roadmap-section-block">
+        <div class="roadmap-step-header">
+          <span class="roadmap-phase-badge" style="background-color: var(--navy-700);">Phase 3</span>
+          <h2 class="roadmap-step-title">Hands-On Practice Projects</h2>
+        </div>
+        <p style="font-size: 0.88rem; color: var(--navy-600); margin-bottom: 14px;">
+          Build genuine portfolio pieces suitable for your BCA project submission or resume.
+        </p>
+        <div id="practiceProjectsList">
+          <!-- Rendered by js/roadmap.js -->
+        </div>
+      </section>
+
+      <!-- Phase 4: Readiness Checklist -->
+      <section class="roadmap-section-block">
+        <div class="roadmap-step-header">
+          <span class="roadmap-phase-badge" style="background-color: var(--success);">Phase 4</span>
+          <h2 class="roadmap-step-title">Final Career Readiness Checklist</h2>
+        </div>
+        <p style="font-size: 0.88rem; color: var(--navy-600); margin-bottom: 14px;">
+          Self-audit your practical preparedness before applying for entry-level internships or job roles.
+        </p>
+        <div id="readinessChecklist" class="roadmap-items-list">
+          <!-- Rendered by js/roadmap.js -->
+        </div>
+      </section>
+
+      <!-- Link to My Progress -->
+      <div style="background-color: #FFFFFF; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 20px; display: flex; justify-content: space-between; align-items: center; margin-top: 30px;">
+        <div>
+          <div style="font-weight: 700; color: var(--navy-900);">Check your overall progress summary</div>
+          <div style="font-size: 0.85rem; color: var(--navy-600);">See your completed items across your student journey.</div>
+        </div>
+        <a href="progress.html" class="btn btn-secondary">
+          Go to My Progress Dashboard →
+        </a>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-content">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="brand-icon" style="width: 26px; height: 26px; font-size: 0.9rem;">S</div>
+          <strong style="color: var(--navy-900);">SkillBridge</strong> — Smart Career &amp; Skill Navigator
+        </div>
+
+        <ul class="footer-nav">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="assessment.html">Assessment</a></li>
+          <li><a href="careers.html">Careers</a></li>
+          <li><a href="roadmap.html">Roadmap</a></li>
+          <li><a href="progress.html">My Progress</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-academic-note">
+        BCA Mini-Project &bull; Built with pure HTML5, CSS3 &amp; Vanilla JavaScript &bull; All assessment calculations and progress saved locally in browser localStorage.
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+  <script src="js/roadmap.js"></script>
+</body>
+</html>
