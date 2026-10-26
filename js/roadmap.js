@@ -5,7 +5,7 @@
  *              practice project ideas, interactive completion checklist, and progress tracking.
  */
 
-document.addEventListener('DOMContentLoaded', function() {
+window.renderRoadmap = function(requestedCareerId) {
   const careerSelectDropdown = document.getElementById('roadmapCareerSelect');
   const roadmapTitle = document.getElementById('roadmapCareerTitle');
   const roadmapCategory = document.getElementById('roadmapCategoryBadge');
@@ -18,16 +18,18 @@ document.addEventListener('DOMContentLoaded', function() {
   const progressBarFill = document.getElementById('roadmapProgressBarFill');
   const completedCountText = document.getElementById('roadmapCompletedCount');
 
-  // Determine active career from URL parameter, or saved selected career, or default
-  const urlParams = new URLSearchParams(window.location.search);
-  let activeCareerId = urlParams.get('career') || Storage.getSelectedCareer() || 'web-developer';
+  if (!beginnerList && !roadmapTitle) return;
 
-  // Ensure active career exists in catalog
+  const urlParams = new URLSearchParams(window.location.search);
+  let activeCareerId = requestedCareerId || urlParams.get('career') || Storage.getSelectedCareer() || 'web-developer';
+
   if (!getCareerById(activeCareerId)) {
     activeCareerId = 'web-developer';
   }
 
-  // Populate dropdown options
+  Storage.setSelectedCareer(activeCareerId);
+
+  // Populate dropdown options once
   if (careerSelectDropdown) {
     careerSelectDropdown.innerHTML = '';
     CAREERS_DATA.forEach(career => {
@@ -40,86 +42,69 @@ document.addEventListener('DOMContentLoaded', function() {
       careerSelectDropdown.appendChild(opt);
     });
 
-    careerSelectDropdown.addEventListener('change', function(e) {
-      activeCareerId = e.target.value;
-      Storage.setSelectedCareer(activeCareerId);
-      // Update URL without full reload for clean state
-      const newUrl = `${window.location.pathname}?career=${activeCareerId}`;
-      window.history.pushState({ path: newUrl }, '', newUrl);
-      renderRoadmap(activeCareerId);
+    if (!careerSelectDropdown._bound) {
+      careerSelectDropdown._bound = true;
+      careerSelectDropdown.addEventListener('change', function(e) {
+        window.renderRoadmap(e.target.value);
+      });
+    }
+  }
+
+  const career = getCareerById(activeCareerId);
+  if (!career) return;
+
+  if (roadmapTitle) roadmapTitle.textContent = `${career.title} Learning Roadmap`;
+  if (roadmapCategory) roadmapCategory.textContent = career.category;
+  if (roadmapDesc) roadmapDesc.textContent = career.shortDesc;
+
+  const checklistState = Storage.getChecklistState();
+
+  // 1. Beginner Milestones
+  if (beginnerList) {
+    beginnerList.innerHTML = '';
+    career.roadmap.beginner.forEach(item => {
+      const isDone = !!checklistState[item.id];
+      beginnerList.appendChild(createChecklistItemElement(item, isDone));
     });
   }
 
-  // Render current career roadmap
-  renderRoadmap(activeCareerId);
-
-  // ---------------------------------------------------------------------------
-  // Roadmap Renderer
-  // ---------------------------------------------------------------------------
-  function renderRoadmap(careerId) {
-    const career = getCareerById(careerId);
-    if (!career) return;
-
-    Storage.setSelectedCareer(careerId);
-
-    // Update Header Meta
-    if (roadmapTitle) roadmapTitle.textContent = `${career.title} Learning Roadmap`;
-    if (roadmapCategory) roadmapCategory.textContent = career.category;
-    if (roadmapDesc) roadmapDesc.textContent = career.shortDesc;
-
-    const checklistState = Storage.getChecklistState();
-
-    // 1. Beginner Milestones
-    if (beginnerList) {
-      beginnerList.innerHTML = '';
-      career.roadmap.beginner.forEach(item => {
-        const isDone = !!checklistState[item.id];
-        beginnerList.appendChild(createChecklistItemElement(item, isDone));
-      });
-    }
-
-    // 2. Intermediate Milestones
-    if (intermediateList) {
-      intermediateList.innerHTML = '';
-      career.roadmap.intermediate.forEach(item => {
-        const isDone = !!checklistState[item.id];
-        intermediateList.appendChild(createChecklistItemElement(item, isDone));
-      });
-    }
-
-    // 3. Practice Projects
-    if (projectsList) {
-      projectsList.innerHTML = '';
-      career.roadmap.projects.forEach(project => {
-        const card = document.createElement('div');
-        card.className = 'project-card-item';
-        card.innerHTML = `
-          <div class="project-title">${escapeHtml(project.title)}</div>
-          <div class="project-desc">${escapeHtml(project.desc)}</div>
-          <div class="project-tags">
-            ${project.skills.map(s => `<span class="skill-tag">${escapeHtml(s)}</span>`).join('')}
-          </div>
-        `;
-        projectsList.appendChild(card);
-      });
-    }
-
-    // 4. Readiness Checklist
-    if (checklistList) {
-      checklistList.innerHTML = '';
-      career.roadmap.readinessChecklist.forEach(item => {
-        const isDone = !!checklistState[item.id];
-        checklistList.appendChild(createChecklistItemElement(item, isDone));
-      });
-    }
-
-    // Recalculate progress metrics
-    updateProgressDisplay(career);
+  // 2. Intermediate Milestones
+  if (intermediateList) {
+    intermediateList.innerHTML = '';
+    career.roadmap.intermediate.forEach(item => {
+      const isDone = !!checklistState[item.id];
+      intermediateList.appendChild(createChecklistItemElement(item, isDone));
+    });
   }
 
-  // ---------------------------------------------------------------------------
-  // Checklist Item Creator
-  // ---------------------------------------------------------------------------
+  // 3. Practice Projects
+  if (projectsList) {
+    projectsList.innerHTML = '';
+    career.roadmap.projects.forEach(project => {
+      const card = document.createElement('div');
+      card.className = 'project-card-item';
+      card.innerHTML = `
+        <div class="project-title">${escapeHtml(project.title)}</div>
+        <div class="project-desc">${escapeHtml(project.desc)}</div>
+        <div class="project-tags">
+          ${project.skills.map(s => `<span class="skill-tag">${escapeHtml(s)}</span>`).join('')}
+        </div>
+      `;
+      projectsList.appendChild(card);
+    });
+  }
+
+  // 4. Readiness Checklist
+  if (checklistList) {
+    checklistList.innerHTML = '';
+    career.roadmap.readinessChecklist.forEach(item => {
+      const isDone = !!checklistState[item.id];
+      checklistList.appendChild(createChecklistItemElement(item, isDone));
+    });
+  }
+
+  updateProgressDisplay(career);
+
   function createChecklistItemElement(item, isDone) {
     const wrapper = document.createElement('label');
     wrapper.className = `checklist-item ${isDone ? 'checked' : ''}`;
@@ -146,33 +131,24 @@ document.addEventListener('DOMContentLoaded', function() {
       } else {
         wrapper.classList.remove('checked');
       }
-      const career = getCareerById(activeCareerId);
       updateProgressDisplay(career);
     });
 
     return wrapper;
   }
 
-  // ---------------------------------------------------------------------------
-  // Progress Calculator
-  // ---------------------------------------------------------------------------
-  function updateProgressDisplay(career) {
-    if (!career) return;
-
-    // Collect all item IDs for current career roadmap
+  function updateProgressDisplay(activeCareer) {
     const allTrackItemIds = [
-      ...career.roadmap.beginner.map(i => i.id),
-      ...career.roadmap.intermediate.map(i => i.id),
-      ...career.roadmap.readinessChecklist.map(i => i.id)
+      ...activeCareer.roadmap.beginner.map(i => i.id),
+      ...activeCareer.roadmap.intermediate.map(i => i.id),
+      ...activeCareer.roadmap.readinessChecklist.map(i => i.id)
     ];
 
-    const checklistState = Storage.getChecklistState();
+    const currentChecklistState = Storage.getChecklistState();
     let completedCount = 0;
 
     allTrackItemIds.forEach(id => {
-      if (checklistState[id]) {
-        completedCount++;
-      }
+      if (currentChecklistState[id]) completedCount++;
     });
 
     const totalCount = allTrackItemIds.length;
@@ -190,5 +166,11 @@ document.addEventListener('DOMContentLoaded', function() {
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
+  }
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof window.renderRoadmap === 'function') {
+    window.renderRoadmap();
   }
 });

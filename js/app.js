@@ -2,7 +2,7 @@
  * SkillBridge — Smart Career & Skill Navigator
  * File: js/app.js
  * Description: Shared career repository, persistent localStorage helpers,
- *              and common UI interactions (navigation, mobile menu).
+ *              and common UI interactions (navigation, mobile menu, view routing).
  */
 
 // -----------------------------------------------------------------------------
@@ -355,7 +355,6 @@ const Storage = {
         month: 'short',
         day: 'numeric'
       }));
-      // Set top career as default active career if not already set
       if (results && results.length > 0) {
         localStorage.setItem(STORAGE_KEYS.SELECTED_CAREER, results[0].careerId);
       }
@@ -374,7 +373,7 @@ const Storage = {
       if (results && results.length > 0) {
         return results[0].careerId;
       }
-      return 'web-developer'; // Safe default
+      return 'web-developer';
     } catch (e) {
       return 'web-developer';
     }
@@ -431,6 +430,80 @@ function getCareerById(careerId) {
 }
 
 // -----------------------------------------------------------------------------
+// Universal View Switcher & Hash Router
+// Supports both seamless single-page preview AND individual page visits!
+// -----------------------------------------------------------------------------
+window.SkillBridgeRouter = {
+  currentView: 'home',
+
+  switchView: function(viewName, params = {}) {
+    const isSinglePage = !!document.getElementById('view-home');
+    if (!isSinglePage) {
+      // In standalone multi-page mode, navigate normally
+      const targetFile = viewName === 'home' ? 'index.html' : `${viewName}.html`;
+      const queryStr = params.career ? `?career=${params.career}` : '';
+      window.location.href = `${targetFile}${queryStr}`;
+      return;
+    }
+
+    // Hide all view containers
+    document.querySelectorAll('.page-view').forEach(view => {
+      view.classList.remove('active');
+    });
+
+    const targetEl = document.getElementById(`view-${viewName}`);
+    if (targetEl) {
+      targetEl.classList.add('active');
+      this.currentView = viewName;
+    } else {
+      // Fallback to home
+      const homeEl = document.getElementById('view-home');
+      if (homeEl) homeEl.classList.add('active');
+      this.currentView = 'home';
+    }
+
+    // Update active nav-links
+    document.querySelectorAll('.nav-link').forEach(link => {
+      const targetAttr = link.getAttribute('data-view');
+      const hrefAttr = link.getAttribute('href') || '';
+      if (targetAttr === viewName || hrefAttr.includes(viewName)) {
+        link.classList.add('active');
+      } else {
+        link.classList.remove('active');
+      }
+    });
+
+    // Close mobile menu if open
+    const navLinks = document.querySelector('.nav-links');
+    if (navLinks) navLinks.classList.remove('open');
+
+    // Trigger view-specific re-renders
+    if (viewName === 'results' && typeof window.renderResults === 'function') {
+      window.renderResults();
+    } else if (viewName === 'careers' && typeof window.renderCareers === 'function') {
+      window.renderCareers();
+    } else if (viewName === 'roadmap' && typeof window.renderRoadmap === 'function') {
+      const careerId = params.career || Storage.getSelectedCareer();
+      window.renderRoadmap(careerId);
+    } else if (viewName === 'progress' && typeof window.renderDashboard === 'function') {
+      window.renderDashboard();
+    } else if (viewName === 'assessment' && typeof window.initAssessment === 'function') {
+      window.initAssessment();
+    }
+
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Update hash without forcing page reload
+    try {
+      history.pushState(null, '', `#${viewName}${params.career ? `?career=${params.career}` : ''}`);
+    } catch (e) {
+      // ignore
+    }
+  }
+};
+
+// -----------------------------------------------------------------------------
 // Navigation & Mobile Menu Setup
 // -----------------------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', function() {
@@ -445,15 +518,50 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Highlight active link based on current path
-  const currentPath = window.location.pathname.split('/').pop() || 'index.html';
-  const links = document.querySelectorAll('.nav-link');
-  links.forEach(link => {
-    const href = link.getAttribute('href');
-    if (href === currentPath || (currentPath === '' && href === 'index.html')) {
-      link.classList.add('active');
-    } else {
-      link.classList.remove('active');
+  // Intercept links on index.html to provide instant tab transitions
+  const isSinglePage = !!document.getElementById('view-home');
+  if (isSinglePage) {
+    document.addEventListener('click', function(e) {
+      const link = e.target.closest('a');
+      if (!link) return;
+
+      const href = link.getAttribute('href');
+      const dataView = link.getAttribute('data-view');
+
+      if (dataView) {
+        e.preventDefault();
+        const careerParam = link.getAttribute('data-career') || (href && href.includes('career=') ? href.split('career=')[1] : null);
+        window.SkillBridgeRouter.switchView(dataView, { career: careerParam });
+        return;
+      }
+
+      if (href) {
+        if (href.startsWith('#')) {
+          e.preventDefault();
+          const target = href.replace('#', '').split('?')[0];
+          const queryPart = href.includes('?') ? href.split('?')[1] : '';
+          const params = new URLSearchParams(queryPart);
+          window.SkillBridgeRouter.switchView(target, { career: params.get('career') });
+        } else if (href.endsWith('.html') || href.includes('.html?')) {
+          const pagePart = href.split('.html')[0].replace('/', '');
+          if (['assessment', 'results', 'careers', 'roadmap', 'progress', 'index'].includes(pagePart)) {
+            e.preventDefault();
+            const targetView = pagePart === 'index' ? 'home' : pagePart;
+            const queryPart = href.includes('?') ? href.split('?')[1] : '';
+            const params = new URLSearchParams(queryPart);
+            window.SkillBridgeRouter.switchView(targetView, { career: params.get('career') });
+          }
+        }
+      }
+    });
+
+    // Check initial hash on load
+    const hash = window.location.hash.replace('#', '');
+    if (hash) {
+      const viewPart = hash.split('?')[0];
+      const queryPart = hash.includes('?') ? hash.split('?')[1] : '';
+      const params = new URLSearchParams(queryPart);
+      window.SkillBridgeRouter.switchView(viewPart, { career: params.get('career') });
     }
-  });
+  }
 });

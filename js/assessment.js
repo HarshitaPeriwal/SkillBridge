@@ -385,35 +385,21 @@ const ASSESSMENT_QUESTIONS = [
 // Assessment State Management
 // -----------------------------------------------------------------------------
 let currentQuestionIndex = 0;
-// answers map: questionIndex -> selected optionId
-const userAnswers = {};
+let userAnswers = {};
+
+window.initAssessment = function() {
+  currentQuestionIndex = 0;
+  userAnswers = {};
+  renderQuestion(currentQuestionIndex);
+};
 
 // -----------------------------------------------------------------------------
-// DOM Elements Cache
-// -----------------------------------------------------------------------------
-let questionCategoryEl;
-let questionNumberEl;
-let questionTextEl;
-let optionsListEl;
-let progressBarEl;
-let prevBtnEl;
-let nextBtnEl;
-let submitBtnEl;
-let validationAlertEl;
-
-// -----------------------------------------------------------------------------
-// Initialization
+// DOM Bindings
 // -----------------------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', function() {
-  questionCategoryEl = document.getElementById('questionCategory');
-  questionNumberEl = document.getElementById('questionNumber');
-  questionTextEl = document.getElementById('questionText');
-  optionsListEl = document.getElementById('optionsList');
-  progressBarEl = document.getElementById('progressBar');
-  prevBtnEl = document.getElementById('prevBtn');
-  nextBtnEl = document.getElementById('nextBtn');
-  submitBtnEl = document.getElementById('submitBtn');
-  validationAlertEl = document.getElementById('validationAlert');
+  const prevBtnEl = document.getElementById('prevBtn');
+  const nextBtnEl = document.getElementById('nextBtn');
+  const submitBtnEl = document.getElementById('submitBtn');
 
   if (prevBtnEl) prevBtnEl.addEventListener('click', handlePrevious);
   if (nextBtnEl) nextBtnEl.addEventListener('click', handleNext);
@@ -429,23 +415,25 @@ function renderQuestion(index) {
   const q = ASSESSMENT_QUESTIONS[index];
   if (!q) return;
 
-  // Clear validation alert
-  if (validationAlertEl) {
-    validationAlertEl.style.display = 'none';
-  }
+  const questionCategoryEl = document.getElementById('questionCategory');
+  const questionNumberEl = document.getElementById('questionNumber');
+  const questionTextEl = document.getElementById('questionText');
+  const optionsListEl = document.getElementById('optionsList');
+  const progressBarEl = document.getElementById('progressBar');
+  const prevBtnEl = document.getElementById('prevBtn');
+  const nextBtnEl = document.getElementById('nextBtn');
+  const submitBtnEl = document.getElementById('submitBtn');
+  const validationAlertEl = document.getElementById('validationAlert');
 
-  // Update header and labels
+  if (validationAlertEl) validationAlertEl.style.display = 'none';
+
   if (questionCategoryEl) questionCategoryEl.textContent = q.category;
   if (questionNumberEl) questionNumberEl.textContent = `Question ${index + 1} of ${ASSESSMENT_QUESTIONS.length}`;
   if (questionTextEl) questionTextEl.textContent = q.question;
 
-  // Update progress bar
   const progressPercent = Math.round(((index + 1) / ASSESSMENT_QUESTIONS.length) * 100);
-  if (progressBarEl) {
-    progressBarEl.style.width = `${progressPercent}%`;
-  }
+  if (progressBarEl) progressBarEl.style.width = `${progressPercent}%`;
 
-  // Render options
   if (optionsListEl) {
     optionsListEl.innerHTML = '';
 
@@ -469,11 +457,9 @@ function renderQuestion(index) {
         </div>
       `;
 
-      // Click listener for option selection
       optionCard.addEventListener('click', function() {
         userAnswers[index] = opt.id;
-        // Update visual selection
-        document.querySelectorAll('.option-item').forEach(el => el.classList.remove('selected'));
+        document.querySelectorAll('#optionsList .option-item').forEach(el => el.classList.remove('selected'));
         optionCard.classList.add('selected');
         const radio = optionCard.querySelector('input[type="radio"]');
         if (radio) radio.checked = true;
@@ -485,26 +471,13 @@ function renderQuestion(index) {
     });
   }
 
-  // Manage Nav Button states
-  if (prevBtnEl) {
-    prevBtnEl.disabled = (index === 0);
-  }
+  if (prevBtnEl) prevBtnEl.disabled = (index === 0);
 
   const isLast = (index === ASSESSMENT_QUESTIONS.length - 1);
-  if (nextBtnEl) {
-    nextBtnEl.style.display = isLast ? 'none' : 'inline-flex';
-  }
-  if (submitBtnEl) {
-    submitBtnEl.style.display = isLast ? 'inline-flex' : 'none';
-  }
-
-  // Scroll smoothly to question top
-  window.scrollTo({ top: 100, behavior: 'smooth' });
+  if (nextBtnEl) nextBtnEl.style.display = isLast ? 'none' : 'inline-flex';
+  if (submitBtnEl) submitBtnEl.style.display = isLast ? 'inline-flex' : 'none';
 }
 
-// -----------------------------------------------------------------------------
-// Navigation Handlers
-// -----------------------------------------------------------------------------
 function handlePrevious() {
   if (currentQuestionIndex > 0) {
     currentQuestionIndex--;
@@ -513,7 +486,6 @@ function handlePrevious() {
 }
 
 function handleNext() {
-  // Validate that current question has an answer
   if (!userAnswers[currentQuestionIndex]) {
     showValidationError('Please select an option before moving to the next question.');
     return;
@@ -526,7 +498,6 @@ function handleNext() {
 }
 
 function handleSubmit() {
-  // Validate all questions
   for (let i = 0; i < ASSESSMENT_QUESTIONS.length; i++) {
     if (!userAnswers[i]) {
       currentQuestionIndex = i;
@@ -536,17 +507,19 @@ function handleSubmit() {
     }
   }
 
-  // Calculate results
   const results = calculateCareerRecommendations();
-  
-  // Save to localStorage
   Storage.saveResults(results);
 
-  // Navigate to results page
-  window.location.href = 'results.html';
+  // Navigate to results view
+  if (window.SkillBridgeRouter && document.getElementById('view-results')) {
+    window.SkillBridgeRouter.switchView('results');
+  } else {
+    window.location.href = 'results.html';
+  }
 }
 
 function showValidationError(message) {
+  const validationAlertEl = document.getElementById('validationAlert');
   if (validationAlertEl) {
     validationAlertEl.textContent = message;
     validationAlertEl.style.display = 'block';
@@ -559,13 +532,11 @@ function showValidationError(message) {
 // Scoring & Recommendation Algorithm
 // -----------------------------------------------------------------------------
 function calculateCareerRecommendations() {
-  // Initialize scores map for all registered careers
   const scores = {};
   CAREERS_DATA.forEach(career => {
     scores[career.id] = 0;
   });
 
-  // Track rationale key phrases based on answers
   const rationales = {
     'data-analyst': [],
     'web-developer': [],
@@ -575,7 +546,6 @@ function calculateCareerRecommendations() {
     'software-developer': []
   };
 
-  // Tally points based on selected options
   ASSESSMENT_QUESTIONS.forEach((q, qIndex) => {
     const selectedOptId = userAnswers[qIndex];
     const selectedOption = q.options.find(o => o.id === selectedOptId);
@@ -585,7 +555,6 @@ function calculateCareerRecommendations() {
       if (scores[careerId] !== undefined) {
         scores[careerId] += weight;
 
-        // Collect rationales for primary weights (>= 3)
         if (weight >= 3) {
           if (q.id === 1) rationales[careerId].push('strong interest in primary domain activities');
           if (q.id === 2) rationales[careerId].push('natural instinctive problem-solving approach');
@@ -597,19 +566,14 @@ function calculateCareerRecommendations() {
     }
   });
 
-  // Maximum potential points achievable in theoretical perfect alignment ~ 27-30
   const maxPossibleScore = 30;
 
-  // Transform scores to structured results array
   const scoredCareers = CAREERS_DATA.map(career => {
     const rawScore = scores[career.id] || 0;
     
-    // Normalize percentage between 42% and 96%
-    // Formula: baseline 40% + (score / maxPossible) * 55%
     let percentage = Math.round(40 + (rawScore / maxPossibleScore) * 55);
     percentage = Math.min(96, Math.max(42, percentage));
 
-    // Construct sensible rationale summary
     const domainRationales = rationales[career.id];
     let rationaleText = '';
     if (domainRationales.length >= 2) {
@@ -633,7 +597,6 @@ function calculateCareerRecommendations() {
     };
   });
 
-  // Sort descending by rawScore. Tie-break using match percentage and alphabetical title
   scoredCareers.sort((a, b) => {
     if (b.rawScore !== a.rawScore) {
       return b.rawScore - a.rawScore;

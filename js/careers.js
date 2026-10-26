@@ -5,13 +5,12 @@
  *              and interactive career profile modal view.
  */
 
-document.addEventListener('DOMContentLoaded', function() {
+window.renderCareers = function() {
   const careersGrid = document.getElementById('careersGrid');
   const searchInput = document.getElementById('searchInput');
   const filterButtons = document.querySelectorAll('.filter-btn');
   const emptyState = document.getElementById('careersEmptyState');
 
-  // Modal elements
   const modalBackdrop = document.getElementById('careerModal');
   const modalCloseBtn = document.getElementById('modalCloseBtn');
   const modalTitle = document.getElementById('modalTitle');
@@ -22,61 +21,57 @@ document.addEventListener('DOMContentLoaded', function() {
   const modalSkillsToImprove = document.getElementById('modalSkillsToImprove');
   const modalRoadmapBtn = document.getElementById('modalRoadmapBtn');
 
-  let activeCategory = 'all';
-  let searchTerm = '';
+  if (!careersGrid) return;
 
-  // Render initial careers list
-  renderCareers();
+  let activeCategory = window._activeCategory || 'all';
+  let searchTerm = window._searchTerm || '';
 
-  // Search input event
-  if (searchInput) {
+  // Setup search input listener once
+  if (searchInput && !searchInput._bound) {
+    searchInput._bound = true;
     searchInput.addEventListener('input', function(e) {
-      searchTerm = e.target.value.toLowerCase().trim();
-      renderCareers();
+      window._searchTerm = e.target.value.toLowerCase().trim();
+      executeFilter();
     });
   }
 
-  // Filter button clicks
+  // Setup filter buttons once
   filterButtons.forEach(btn => {
-    btn.addEventListener('click', function() {
-      filterButtons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      activeCategory = btn.getAttribute('data-category') || 'all';
-      renderCareers();
-    });
+    if (!btn._bound) {
+      btn._bound = true;
+      btn.addEventListener('click', function() {
+        filterButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        window._activeCategory = btn.getAttribute('data-category') || 'all';
+        executeFilter();
+      });
+    }
   });
 
-  // Modal close handlers
-  if (modalCloseBtn) {
+  // Setup modal close handlers once
+  if (modalCloseBtn && !modalCloseBtn._bound) {
+    modalCloseBtn._bound = true;
     modalCloseBtn.addEventListener('click', closeModal);
   }
-  if (modalBackdrop) {
+  if (modalBackdrop && !modalBackdrop._bound) {
+    modalBackdrop._bound = true;
     modalBackdrop.addEventListener('click', function(e) {
       if (e.target === modalBackdrop) {
         closeModal();
       }
     });
   }
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && modalBackdrop && modalBackdrop.classList.contains('open')) {
-      closeModal();
-    }
-  });
 
-  // ---------------------------------------------------------------------------
-  // Render Careers with Filtering
-  // ---------------------------------------------------------------------------
-  function renderCareers() {
-    if (!careersGrid) return;
+  executeFilter();
+
+  function executeFilter() {
+    activeCategory = window._activeCategory || 'all';
+    searchTerm = window._searchTerm || '';
 
     const filtered = CAREERS_DATA.filter(career => {
-      // Category match
       const matchesCategory = (activeCategory === 'all') || (career.categorySlug === activeCategory);
-
-      // Search match across title, description, and required skills
       const searchHaystack = `${career.title} ${career.shortDesc} ${career.requiredSkills.join(' ')}`.toLowerCase();
       const matchesSearch = !searchTerm || searchHaystack.includes(searchTerm);
-
       return matchesCategory && matchesSearch;
     });
 
@@ -93,7 +88,6 @@ document.addEventListener('DOMContentLoaded', function() {
       const card = document.createElement('div');
       card.className = 'card career-browse-card';
 
-      // Required skills tags (display up to 4 on preview card)
       const skillTagsHtml = career.requiredSkills.slice(0, 4).map(skill => `
         <span class="skill-tag">${escapeHtml(skill)}</span>
       `).join('');
@@ -112,16 +106,15 @@ document.addEventListener('DOMContentLoaded', function() {
           </div>
         </div>
         <div style="display: flex; gap: 10px; margin-top: auto;">
-          <button class="btn btn-secondary btn-sm view-details-btn" data-id="${career.id}" style="flex: 1;">
+          <button type="button" class="btn btn-secondary btn-sm view-details-btn" data-id="${career.id}" style="flex: 1;">
             View Details
           </button>
-          <a href="roadmap.html?career=${career.id}" class="btn btn-primary btn-sm" style="flex: 1;">
+          <a href="roadmap.html?career=${career.id}" data-view="roadmap" data-career="${career.id}" class="btn btn-primary btn-sm" style="flex: 1;">
             Roadmap →
           </a>
         </div>
       `;
 
-      // Attach View Details click listener
       const viewBtn = card.querySelector('.view-details-btn');
       if (viewBtn) {
         viewBtn.addEventListener('click', function() {
@@ -133,12 +126,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // ---------------------------------------------------------------------------
-  // Modal Open & Populate
-  // ---------------------------------------------------------------------------
   function openModal(career) {
     if (!modalBackdrop) return;
-
     if (modalTitle) modalTitle.textContent = career.title;
     if (modalCategory) modalCategory.textContent = career.category;
     if (modalDesc) modalDesc.textContent = career.fullDesc || career.shortDesc;
@@ -158,8 +147,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (modalRoadmapBtn) {
       modalRoadmapBtn.setAttribute('href', `roadmap.html?career=${career.id}`);
+      modalRoadmapBtn.setAttribute('data-view', 'roadmap');
+      modalRoadmapBtn.setAttribute('data-career', career.id);
       modalRoadmapBtn.onclick = function() {
         Storage.setSelectedCareer(career.id);
+        closeModal();
       };
     }
 
@@ -180,5 +172,11 @@ document.addEventListener('DOMContentLoaded', function() {
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
+  }
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof window.renderCareers === 'function') {
+    window.renderCareers();
   }
 });

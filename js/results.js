@@ -5,26 +5,27 @@
  *              assessment scoring algorithm, along with rationale, skill gaps, and roadmap links.
  */
 
-document.addEventListener('DOMContentLoaded', function() {
+window.renderResults = function() {
   const resultsContainer = document.getElementById('resultsContainer');
   const emptyState = document.getElementById('resultsEmptyState');
   const retakeBtn = document.getElementById('retakeAssessmentBtn');
+
+  if (!resultsContainer) return;
 
   const results = Storage.getResults();
 
   if (!results || results.length === 0) {
     if (emptyState) emptyState.style.display = 'block';
-    if (resultsContainer) resultsContainer.style.display = 'none';
+    resultsContainer.style.display = 'none';
     return;
   }
 
   if (emptyState) emptyState.style.display = 'none';
-  if (resultsContainer) resultsContainer.style.display = 'block';
+  resultsContainer.style.display = 'block';
+  resultsContainer.innerHTML = '';
 
-  // Take the top 3 recommendations
   const topMatches = results.slice(0, 3);
 
-  // Render each of the top 3 recommendations
   topMatches.forEach((match, index) => {
     const isTopOne = (index === 0);
     const card = document.createElement('div');
@@ -32,10 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const rankLabel = index === 0 ? 'Top Recommendation #1' : index === 1 ? 'Strong Match #2' : 'Alternative Match #3';
 
-    // Required skills tags
     const reqSkillsHtml = match.requiredSkills.map(s => `<span class="skill-tag">${escapeHtml(s)}</span>`).join('');
-    
-    // Skills to improve tags
     const improveSkillsHtml = match.skillsToImprove.map(s => `<span class="skill-tag improve-tag">${escapeHtml(s)}</span>`).join('');
 
     card.innerHTML = `
@@ -73,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
 
       <div class="result-card-actions">
-        <a href="roadmap.html?career=${match.careerId}" class="btn btn-primary" onclick="Storage.setSelectedCareer('${match.careerId}')">
+        <a href="roadmap.html?career=${match.careerId}" data-view="roadmap" data-career="${match.careerId}" class="btn btn-primary" onclick="Storage.setSelectedCareer('${match.careerId}')">
           View Learning Roadmap →
         </a>
       </div>
@@ -82,9 +80,14 @@ document.addEventListener('DOMContentLoaded', function() {
     resultsContainer.appendChild(card);
   });
 
-  if (retakeBtn) {
+  if (retakeBtn && !retakeBtn._hasClickListener) {
+    retakeBtn._hasClickListener = true;
     retakeBtn.addEventListener('click', function() {
-      window.location.href = 'assessment.html';
+      if (window.SkillBridgeRouter && document.getElementById('view-assessment')) {
+        window.SkillBridgeRouter.switchView('assessment');
+      } else {
+        window.location.href = 'assessment.html';
+      }
     });
   }
 
@@ -95,5 +98,11 @@ document.addEventListener('DOMContentLoaded', function() {
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
+  }
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof window.renderResults === 'function') {
+    window.renderResults();
   }
 });
